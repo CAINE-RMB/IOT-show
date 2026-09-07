@@ -1,0 +1,41 @@
+<!-- CAINE ESP 控制臺 -->
+<view class="page" style="padding-top: {{statusBarHeight}}px;">
+  <view class="header">
+    <text class="header-line">CAINE</text>
+    <text class="header-line">ESP</text>
+  </view>
+
+  <view class="card status-card">
+    <view class="status-grid">
+      <view class="status-cell">
+        <text class="status-text">湿度：{{humidity}}%</text>
+      </view>
+      <view class="status-cell status-cell--right">
+        <text class="status-text">设备在线 {{onlineMark}}</text>
+      </view>
+      <view class="status-cell">
+        <text class="status-text">温度：{{temperature}}°C</text>
+      </view>
+      <view class="status-cell status-cell--right">
+        <text class="status-text">光照强度：{{light}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card control-card">
+    <text class="control-title">控制</text>
+    <view class="dpad">
+      <view class="dpad-row dpad-row--top">
+        <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="up">▲</button>
+      </view>
+      <view class="dpad-row dpad-row--mid">
+        <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="left">◀</button>
+        <view class="dpad-center"></view>
+        <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="right">▶</button>
+      </view>
+      <view class="dpad-row dpad-row--bottom">
+        <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="down">▼</button>
+      </view>
+    </view>
+  </view>
+</view>

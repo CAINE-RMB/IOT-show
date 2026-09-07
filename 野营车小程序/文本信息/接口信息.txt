@@ -1,0 +1,31 @@
+
+华为云MQTT密钥
+{
+    "username": "69a8f163cbb0cf6bb943fca5_20260305",
+    "password": "7e4a2beac5525e5c09ac68a0bc86885d7bb7adb7da40896b3873a4d8c7286e93",
+    "clientId": "69a8f163cbb0cf6bb943fca5_20260305_0_0_2026030702",
+    "hostname": "4ce16929b3.st1.iotda-device.cn-north-4.myhuaweicloud.com",
+    "port": 8883,
+    "protocol": "MQTTS"
+}
+
+华为云IAM（API凭证）
+{
+    IAM用户ID（user_id）：45a0165b046e403ca1fe6e46b025f2ac
+    IAM用户名（user name）:CAINE
+    IAM用户密码:031002Aa
+    账户名（domain name）：aa031002
+    主账户用户名（domain_id）:3f69918809e241d08869899fea16a441
+    项目ID（project_id）：3856a93afb624a4cb1ce416f97fcccb2
+    项目（project name）:cn-north-4
+    用户组ID:a1e2dd4225994d649f97667b9000448c
+    Access Key Id：HPUA10PK4LQA468FNSEW
+    Secret Access Key：YO4EMwhNNyZMAYW8IWLoK2WOLycPV5klylZlyKJe
+
+
+    device_id:69a8f163cbb0cf6bb943fca5_20260305
+    secret:031002Aa
+    访问密钥ID:HPUA10PK4LQA468FNSEW
+
+}
+

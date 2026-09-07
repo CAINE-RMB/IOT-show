@@ -1,0 +1,214 @@
+/** 華為雲 IoT — 新擬態 + 版面層級優化 **/
+page {
+  background-color: #eeeeee;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 8rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+/* 主標題：上移、字號加大（對應圖二） */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rpx 0 28rpx;
+}
+
+.header-line {
+  display: block;
+  font-size: 80rpx;
+  font-weight: 700;
+  color: #333333;
+  letter-spacing: 6rpx;
+  line-height: 1.12;
+}
+
+.section {
+  margin-bottom: 24rpx;
+}
+
+.section--last {
+  flex: 1;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 44rpx;
+  box-shadow: 8rpx 12rpx 28rpx rgba(0, 0, 0, 0.06);
+  padding: 32rpx 32rpx 36rpx;
+  box-sizing: border-box;
+}
+
+.card-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #3a3a3a;
+  margin-bottom: 20rpx;
+}
+
+.card-title--inline {
+  margin-bottom: 16rpx;
+}
+
+.status-card .status-grid {
+  margin-top: 4rpx;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 22rpx 20rpx;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.status-cell--right {
+  justify-content: flex-end;
+}
+
+.status-text {
+  font-size: 28rpx;
+  color: #3a3a3a;
+  line-height: 1.45;
+}
+
+.message-card {
+  padding-top: 28rpx;
+  padding-bottom: 32rpx;
+}
+
+.message-text {
+  display: block;
+  font-size: 28rpx;
+  color: #444444;
+  line-height: 1.55;
+  word-break: break-all;
+}
+
+.toolbar-card {
+  padding-bottom: 32rpx;
+}
+
+.toolbar-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20rpx;
+  margin-top: 8rpx;
+}
+
+.toolbar-btn {
+  flex: 1;
+  height: 88rpx;
+  padding: 0 16rpx;
+  margin: 0;
+  line-height: 88rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4a4a4a;
+  background: linear-gradient(145deg, #f5f5f5, #e8e8e8);
+  border-radius: 28rpx;
+  border: none;
+  box-shadow: 6rpx 6rpx 14rpx rgba(0, 0, 0, 0.07), -4rpx -4rpx 10rpx rgba(255, 255, 255, 0.85);
+}
+
+.toolbar-btn::after {
+  border: none;
+}
+
+.toolbar-btn--hover {
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+/* 方向鍵區（與示例假冒一致） */
+.dpad-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 520rpx;
+}
+
+.dpad-hint {
+  display: block;
+  font-size: 24rpx;
+  color: #888888;
+  margin-bottom: 16rpx;
+  line-height: 1.4;
+}
+
+.dpad {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 0 32rpx;
+  min-height: 400rpx;
+}
+
+.dpad-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpad-row--top {
+  margin-bottom: 20rpx;
+}
+
+.dpad-row--mid {
+  gap: 36rpx;
+}
+
+.dpad-row--bottom {
+  margin-top: 20rpx;
+}
+
+.dpad-center {
+  width: 120rpx;
+  height: 120rpx;
+}
+
+.arrow-btn {
+  width: 120rpx;
+  height: 120rpx;
+  padding: 0;
+  margin: 0;
+  line-height: 120rpx;
+  font-size: 44rpx;
+  color: #5a5a5a;
+  background: linear-gradient(145deg, #f5f5f5, #e8e8e8);
+  border-radius: 32rpx;
+  border: none;
+  box-shadow: 6rpx 6rpx 16rpx rgba(0, 0, 0, 0.08), -4rpx -4rpx 12rpx rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-btn::after {
+  border: none;
+}
+
+.arrow-btn--hover {
+  opacity: 0.85;
+  transform: scale(0.96);
+}

@@ -1,0 +1,82 @@
+要解决华为云 IAM 获取 Token 时的 401 未授权问题 并正确获取 URL 和 X-Subject-Token，需按以下步骤排查和操作：  
+
+一、核心概念与流程回顾
+
+华为云 IAM（Identity and Access Management）的 Token 认证流程：  
+1. 向华为云 IAM 服务发送包含 AK/SK、Domain/Project 信息的 POST 请求。  
+2. 请求成功后，响应头 X-Subject-Token 或响应体 token.id 即为后续调用其他云服务的 Token。  
+
+二、解决 401 未授权问题（关键！）
+
+401 错误表示请求的认证信息无效，需从以下维度排查：  
+
+1. 验证华为云账号凭证（AK/SK、Domain/Project ID）
+
+• AK/SK：登录华为云控制台 → 右上角头像 →「我的凭证」→「访问密钥」，确认 AK（Access Key）和 SK（Secret Key）是否正确（注意区分主账号/子账号，子账号需有权限）。  
+
+• Domain ID：同上页面，「帐号信息」中的 帐号 ID 即为 Domain ID（子用户需用父账号的 Domain ID）。  
+
+• Project ID：登录华为云控制台 → 左上角「项目」下拉框 →「我的项目」，选择目标项目的 项目 ID（若为默认项目，可查看控制台提示）。  
+
+2. 验证请求体格式（V3 Token 接口要求）
+
+华为云 IAM V3 版本的 Token 请求体必须严格遵循 JSON 结构，示例（替换为自己的凭证）：  
+{
+  "auth": {
+    "identity": {
+      "methods": ["password"],  // 认证方式（固定为 password）
+      "password": {
+        "user": {
+          "domain_id": "your_domain_id",  // 替换为 Domain ID
+          "name": "your_ak",              // 替换为 AK
+          "password": "your_sk"           // 替换为 SK
+        }
+      }
+    },
+    "scope": {
+      "project": {
+        "id": "your_project_id"  // 替换为 Project ID（若为全局项目，可省略 scope 或设为 domain）
+      }
+    }
+  }
+}
+  
+
+3. 验证请求 URL
+
+华为云 IAM 的 Token 接口 URL 格式为：  
+https://{IAM Endpoint}/v3/auth/tokens  
+
+不同区域的 IAM Endpoint 不同（如北京四区为 iam.cn-north-4.myhuaweicloud.com，上海二区为 iam.cn-east-3.myhuaweicloud.com）。需确认：  
+• 你的华为云资源所在区域（控制台右上角显示的区域）。  
+
+• URL 中的 Region 与资源区域一致（否则会因跨区域权限报错）。  
+
+4. 验证小程序网络请求配置（跨域问题）
+
+若在微信小程序中请求 IAM 接口，需注意小程序合法域名配置：  
+• 登录微信公众平台 → 开发 → 开发管理 →「服务器域名」→「downloadFile 域名」（因 POST 请求属于“下载类”，需配置此域名；或勾选开发工具的「不校验合法域名」临时测试）。  
+
+• 小程序代码中，使用 wx.request 时需确保 URL 为 https 且域名已配置。  
+
+三、获取 Token（成功后）
+
+当 POST 请求状态码为 201 Created 时，Token 可从以下位置获取：  
+1. 响应头：X-Subject-Token 字段（直接读取响应头即可）。  
+2. 响应体：data.token.id 字段（V3 版本 Token 存储在响应体的 token.id 中）。  
+
+四、调试工具推荐（快速定位问题）
+
+若代码层面排查困难，建议先用 Postman 手动测试请求，确认参数正确后再移植到代码中：  
+1. Postman 新建请求 → 方法选 POST → URL 填 https://{IAM Endpoint}/v3/auth/tokens。  
+2. 「Body」选 raw → 类型 JSON → 粘贴上述请求体模板并替换凭证。  
+3. 发送请求 → 若响应码为 201，查看响应头 X-Subject-Token 和响应体 token.id；若仍 401，Postman 会明确提示错误原因（如凭证错误、格式错误）。  
+
+总结步骤
+
+1. 用 Postman 手动测试，确认 AK/SK、Domain/Project ID、URL、请求体格式正确。  
+2. 解决跨域问题（小程序合法域名配置）。  
+3. 代码中复用 Postman 测试成功的参数，发起请求。  
+4. 成功后，从响应头 X-Subject-Token 或响应体 token.id 中提取 Token。  
+
+若仍遇问题，可将 Postman 测试结果 和 代码中网络请求的完整代码段 补充后进一步分析～

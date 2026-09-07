@@ -1,0 +1,153 @@
+# 华为云 IoTDA 配置说明（与当前 src/main.cpp 一致）
+
+按下列步骤在控制台配好**物模型**后，烧录固件、接好 Wi-Fi，设备即可按固件周期上报告警；属性**标识符（英文）必须与下表完全一致**（区分大小写）。
+
+---
+
+## 一、设备与固件必须一致的信息
+
+以下内容在 **IoTDA → 设备 → 具体设备** 或 **产品 → 接入信息** 中与 `main.cpp` 对齐：
+
+| 项 | 固件中的含义 | 说明 |
+|----|----------------|------|
+| 设备 ID | `MQTT_DEVICE_ID` | 当前示例：`69a8f163cbb0cf6bb943fca5_20260305` |
+| MQTT 用户名 | 通常等于设备 ID | 与控制台「MQTT 连接信息」一致 |
+| MQTT 密码 | `MQTT_PASSWORD` | **以控制台当前密钥为准**，修改后必须同步改 `main.cpp` |
+| 接入域名 | `MQTT_SERVER` | 当前示例：`4ce16929b3.st1.iotda-device.cn-north-4.myhuaweicloud.com` |
+| 端口 | `8883` | MQTTS |
+| 属性上报 Topic | `TOPIC_REPORT` | `$oc/devices/{设备ID}/sys/properties/report` |
+| 命令订阅 Topic | `TOPIC_COMMAND` | `$oc/devices/{设备ID}/sys/commands/#` |
+
+若你在华为云**新建了另一台设备**，请把 `main.cpp` 里的 `MQTT_DEVICE_ID`、`MQTT_USERNAME`、`MQTT_PASSWORD`、`TOPIC_REPORT`、`TOPIC_COMMAND` 全部改成新设备的值（Topic 里的设备 ID 也要一起改）。
+
+Wi-Fi：`WIFI_SSID` / `WIFI_PASSWORD` 改成你现场路由器，否则板子无法上网、MQTT 不会连上。
+
+---
+
+## 二、产品模型定义（核心：与 JSON 键名一致）
+
+路径：**IoTDA → 产品 → 你的产品（如 ESP32-IOT）→ 模型定义**。
+
+### 1. 服务（左侧服务列表）
+
+- **服务 ID / 服务名称**：`ESP32-IOT`  
+  与固件中 `svc["service_id"] = "ESP32-IOT"` 必须一致。
+
+### 2. 属性列表（在该服务下「添加属性」）
+
+| 标识符（英文） | 数据类型 | 读写 | 含义（与固件一致） |
+|----------------|----------|------|---------------------|
+| `temperature` | 小数（decimal） | 只读 | 温度（℃），仅 DHT11 读取成功时上报 |
+| `humidity` | 小数（decimal） | 只读 | 湿度（%），仅 DHT11 读取成功时上报 |
+| `motion` | **整型（int）** | 只读 | 人体红外 HC-SR501：`0` 无移动，`1` 有移动 |
+| `smoke` | **整型（int）** | 只读 | 烟雾 FC-22 判定：`0` 无，`1` 有（阈值见固件 `FC22_SMOKE_ON_V` / `OFF_V`） |
+
+说明：
+
+- 固件每约 **5 秒**上报一次；DHT 失败时当次 JSON **可能不含** `temperature`/`humidity`，仍会带 `motion`、`smoke`。属性请勿设为「必填」以免平台校验过严（按你控制台实际选项调整）。
+- 不要再在模型里要求 `gas_adc_v`、`gas_ao_est_v`（固件已不上报）。
+
+### 3. 命令列表（下行控制马达）
+
+固件解析字段：`command_name`、`paras`（JSON）。
+
+**命令 1**
+
+- **命令名称**：`motor_set`（控制台填写此名称；也支持 `MotorSet`，与代码兼容）
+- **下发参数**（参数名需与下表一致，类型建议 int 或 string）：
+
+| 参数标识符 | 类型 | 含义 |
+|------------|------|------|
+| `motor_index` 或 `index` | int | 马达编号 **0～3** |
+| `direction` 或 `dir` | int 或 string | `0` / `stop` 停止；`1` / `forward` 正转；`2` / `backward` 反转 |
+
+**命令 2**
+
+- **命令名称**：`motor_all`（或 `MotorAll`）
+- **下发参数**：
+
+| 参数标识符 | 类型 | 含义 |
+|------------|------|------|
+| `direction` 或 `dir` | int 或 string | 同上，四路马达同时动作 |
+
+删除或与固件无关的命令（例如占位用的 `Exercise`）请不要再依赖，否则设备侧会回复 `unknown_command`。
+
+---
+
+## 三、设备侧实际上报的 JSON 示例（便于对照）
+
+DHT 正常时，固件序列化结果形态如下（数值随传感器变化）：
+
+```json
+{
+  "services": [
+    {
+      "service_id": "ESP32-IOT",
+      "properties": {
+        "temperature": 25.3,
+        "humidity": 60.0,
+        "motion": 0,
+        "smoke": 0
+      }
+    }
+  ]
+}
+```
+
+DHT 失败时可能为：
+
+```json
+{
+  "services": [
+    {
+      "service_id": "ESP32-IOT",
+      "properties": {
+        "motion": 0,
+        "smoke": 0
+      }
+    }
+  ]
+}
+```
+
+Topic：`$oc/devices/69a8f163cbb0cf6bb943fca5_20260305/sys/properties/report`（设备 ID 以你控制台为准）。
+
+---
+
+## 四、烧录后自检顺序
+
+1. 华为云物模型已保存并（若需要）发布；服务 ID = `ESP32-IOT`，属性标识符与上表一致。  
+2. `main.cpp` 中 Wi-Fi、MQTT 用户名/密码、设备 ID、Topic 与控制台一致。  
+3. 上电后串口 115200：应出现 Wi-Fi 连接、MQTT connect ... OK、`[Cloud] report` 与 JSON。  
+4. 控制台：**设备 → 消息** 或 **最新上报数据 / 设备影子** 查看是否收到属性。  
+
+若 MQTT 连接失败：优先核对**密码是否为控制台当前密钥**（勿与 `test/备注` 里旧 JSON 混用）。
+
+---
+
+## 五、命令下发示例（平台侧调试时可参考）
+
+单路马达 0 正转（具体外层格式以华为云「命令调试」生成的 JSON 为准，以下为 `paras` 语义）：
+
+```json
+{
+  "motor_index": 0,
+  "direction": 1
+}
+```
+
+全部停止：
+
+```json
+{
+  "direction": 0
+}
+```
+
+（`motor_all` 时仅 `direction`/`dir` 有效。）
+
+---
+
+## 六、与《test/备注》的关系
+
+设备密钥、MQTT 密码以 **华为云控制台当前设备** 为准；修改后务必同步更新 `main.cpp`，并视情况更新 `test/备注` 备忘，避免多份密码不一致导致「烧录后连云失败」。

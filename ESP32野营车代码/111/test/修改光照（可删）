@@ -1,0 +1,25 @@
+已依你的要求調整：光照相關程式都還在檔案裡，只是用註解「關掉」、沒有刪掉，並在腳位區、EnvData、readEnvData、上報、setup 都留下對應的註解對照，方便日後還原。
+
+變更要點
+#if 0 改為區塊註解 /* ... */
+GZ-A1 的常數與 readLightBrightnessPercent()、readLightLuxApprox() 整段原文都放在一個大區塊註解裡，語意是「整段保留、暫不編譯」，不是刪除。
+
+腳位區補上「註解掉的」光照常數（與現行程式並列，僅供還原時參考）
+
+// const int GZ_A1_AO_PIN = 32;
+// const float GZ_A1_LUX_MAX = 20000.0f;
+EnvData
+保留兩個已註解的成員說明：
+
+// float light_percent;
+// float illuminance_lux;
+readEnvData()
+保留兩行已註解的呼叫範例（指向上面區塊註解裡的函式）。
+
+reportEnvDataToCloud()
+保留已註解的 props["light"]、props["illuminance_lux"] 寫法。
+
+setup()
+保留已註解的 pinMode(GZ_A1_AO_PIN, INPUT); 並加簡短還原說明。
+
+之後若要恢復光照：依註解說明依序取消註解、改回 EnvData 欄位、關掉 PIR 相關即可；區塊註解裡的 GZ-A1 函式要改回可編譯，需把外層的 /* … */ 拿掉（或改成一般程式碼），並與 HC-SR501 的 GPIO32 擇一接線。

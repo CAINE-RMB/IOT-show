@@ -1,0 +1,29 @@
+ESP32华为云产品密钥以及账号
+
+【重要】下列 JSON 若与 src/main.cpp 中 MQTT 密码、或华为云控制台当前密钥不一致，以控制台为准并同步更新固件与本文档，否则无法连云。
+
+{
+    "device_id": "69a8f163cbb0cf6bb943fca5_20260305",
+    "secret": "caad5efdf419a24b30814b829ffbda87"
+}
+
+
+MQTT配置文件
+{
+    //旧的
+    "username": "69a8f163cbb0cf6bb943fca5_20260305",
+    "password": "8be5e067417ec70dcda6a9bb4d2f14ceb394d9d1d5fd5831c52b8a60808d66b1",
+    "clientId": "69a8f163cbb0cf6bb943fca5_20260305_0_0_2026030504",
+    "hostname": "4ce16929b3.st1.iotda-device.cn-north-4.myhuaweicloud.com",
+    "port": 8883,
+    "protocol": "MQTTS"
+}
+
+{
+    "username": "69a8f163cbb0cf6bb943fca5_20260305",
+    "password": "b02388245487431ae898f42c5dca0c8d3e3e8f5df97962e88041ccbb74a7d4d0",
+    "clientId": "69a8f163cbb0cf6bb943fca5_20260305_0_0_2026033004",
+    "hostname": "4ce16929b3.st1.iotda-device.cn-north-4.myhuaweicloud.com",
+    "port": 8883,
+    "protocol": "MQTTS"
+}

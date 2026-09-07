@@ -1,0 +1,31 @@
+    /**
+     * 获取token
+     */
+    gettoken:function(){
+        console.log("开始获取。。。");//打印完整消息
+        var that=this;  //这个很重要，在下面的回调函数中由于异步问题不能有效修改变量，需要用that获取
+        wx.request({
+            url: 'https://iam.cn-north-4.myhuaweicloud.com/v3/auth/tokens',
+            data:'{"auth": { "identity": {"methods": ["password"],"password": {"user": {"name": "aa031002","password": "031002Aa","domain": {"name": "3f69918809e241d08869899fea16a441"}}}},"scope": {"project": {"name": "cn-north-4"}}}}',
+            method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+            header: {'content-type': 'application/json' }, // 请求的 header 
+            success: function(res){// success
+              // success
+                console.log("获取token成功");//打印完整消息
+                console.log(res);//打印完整消息
+                var token='';
+                token=JSON.stringify(res.header['X-Subject-Token']);//解析消息头的token
+                token=token.replaceAll("\"", "");
+                console.log("获取token=\n"+token);//打印token
+                wx.setStorageSync('token',token);//把token写到缓存中,以便可以随时随地调用
+            },
+            fail:function(){
+                // fail
+                console.log("获取token失败");//打印完整消息
+            },
+            complete: function() {
+                // complete
+                console.log("获取token完成");//打印完整消息
+            } 
+        });
+    },

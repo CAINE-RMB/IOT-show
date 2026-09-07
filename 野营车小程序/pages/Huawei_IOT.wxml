@@ -1,0 +1,64 @@
+<!-- 華為雲 IoT — 新擬態 + 方向指令 -->
+<view class="page" style="padding-top: {{statusBarHeight}}px;">
+  <view class="header">
+    <text class="header-line">華為雲</text>
+    <text class="header-line">IoT</text>
+  </view>
+
+  <view class="section">
+    <view class="card status-card">
+      <text class="card-title card-title--inline">即時數據</text>
+      <view class="status-grid">
+        <view class="status-cell">
+          <text class="status-text">濕度：{{humidityLine}}</text>
+        </view>
+        <view class="status-cell status-cell--right">
+          <text class="status-text">設備在線 {{onlineMark}}</text>
+        </view>
+        <view class="status-cell">
+          <text class="status-text">溫度：{{temperatureLine}}</text>
+        </view>
+        <view class="status-cell status-cell--right">
+          <text class="status-text">光照強度：{{lightLine}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card message-card">
+      <text class="card-title card-title--inline">狀態</text>
+      <text class="message-text">{{result}}</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card toolbar-card">
+      <text class="card-title card-title--inline">連線</text>
+      <view class="toolbar-row">
+        <button class="toolbar-btn" hover-class="toolbar-btn--hover" bindtap="touchBtn_gettoken">取得 Token</button>
+        <button class="toolbar-btn" hover-class="toolbar-btn--hover" bindtap="touchBtn_getshadow">取得影子</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="section section--last">
+    <view class="card dpad-card">
+      <text class="card-title">方向指令</text>
+      <text class="dpad-hint">點擊方向鍵下發命令（需先取得 Token）</text>
+      <view class="dpad">
+        <view class="dpad-row dpad-row--top">
+          <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="up">▲</button>
+        </view>
+        <view class="dpad-row dpad-row--mid">
+          <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="left">◀</button>
+          <view class="dpad-center"></view>
+          <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="right">▶</button>
+        </view>
+        <view class="dpad-row dpad-row--bottom">
+          <button class="arrow-btn" hover-class="arrow-btn--hover" bindtap="onArrowTap" data-dir="down">▼</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

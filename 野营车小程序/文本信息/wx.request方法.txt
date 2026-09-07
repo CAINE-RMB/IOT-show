@@ -1,0 +1,16 @@
+wx.request({
+       url: '',
+       data:'',
+       method: '', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+       header: {}, // 设置请求的 header 
+       success: function(res){// success
+       // success
+       	console.log(res);//打印完整消息
+       },
+        fail:function(){
+        // fail
+       },
+        complete: function() {
+       // complete
+       } 
+ });

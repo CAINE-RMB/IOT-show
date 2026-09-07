@@ -1,0 +1,141 @@
+/** CAINE ESP 新擬態主題 **/
+page {
+  background-color: #f0f0f0;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24rpx 40rpx 80rpx;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0 40rpx;
+}
+
+.header-line {
+  display: block;
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #3a3a3a;
+  letter-spacing: 4rpx;
+  line-height: 1.15;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 50rpx;
+  box-shadow: 10rpx 10rpx 30rpx rgba(0, 0, 0, 0.05);
+  padding: 40rpx 36rpx;
+  margin-bottom: 32rpx;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 28rpx 24rpx;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.status-cell--right {
+  justify-content: flex-end;
+}
+
+.status-text {
+  font-size: 28rpx;
+  color: #3a3a3a;
+  line-height: 1.4;
+}
+
+.control-card {
+  position: relative;
+  flex: 1;
+  min-height: 620rpx;
+  padding: 56rpx 36rpx 56rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.control-title {
+  position: absolute;
+  left: 36rpx;
+  top: 40rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #3a3a3a;
+}
+
+.dpad {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0 72rpx;
+  min-height: 480rpx;
+}
+
+.dpad-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpad-row--top {
+  margin-bottom: 20rpx;
+}
+
+.dpad-row--mid {
+  gap: 36rpx;
+}
+
+.dpad-row--bottom {
+  margin-top: 20rpx;
+}
+
+.dpad-center {
+  width: 120rpx;
+  height: 120rpx;
+}
+
+.arrow-btn {
+  width: 120rpx;
+  height: 120rpx;
+  padding: 0;
+  margin: 0;
+  line-height: 120rpx;
+  font-size: 44rpx;
+  color: #6a6a6a;
+  background: linear-gradient(145deg, #f5f5f5, #e8e8e8);
+  border-radius: 32rpx;
+  border: none;
+  box-shadow: 6rpx 6rpx 16rpx rgba(0, 0, 0, 0.08), -4rpx -4rpx 12rpx rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-btn::after {
+  border: none;
+}
+
+.arrow-btn--hover {
+  opacity: 0.85;
+  transform: scale(0.96);
+}

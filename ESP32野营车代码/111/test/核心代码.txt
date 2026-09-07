@@ -1,0 +1,194 @@
+// 最核心代码提取
+
+// 电机控制
+enum MotorDirection {
+  MOTOR_STOP = 0,
+  MOTOR_FORWARD,
+  MOTOR_BACKWARD
+};
+
+void setMotorDirection(uint8_t index, MotorDirection dir) {
+  if (index >= 4) return;
+  int in1 = motors[index].in1;
+  int in2 = motors[index].in2;
+  switch (dir) {
+    case MOTOR_FORWARD:
+      digitalWrite(in1, HIGH);
+      digitalWrite(in2, LOW);
+      break;
+    case MOTOR_BACKWARD:
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, HIGH);
+      break;
+    case MOTOR_STOP:
+    default:
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, LOW);
+      break;
+  }
+}
+
+void setAllMotors(MotorDirection dir) {
+  for (uint8_t i = 0; i < 4; ++i) {
+    setMotorDirection(i, dir);
+  }
+}
+
+// 传感器读取
+struct EnvData {
+  bool     dht_ok;
+  float    temperature;
+  float    humidity;
+  bool     motion;
+  bool     smoke;
+};
+
+EnvData readEnvData() {
+  EnvData d;
+  d.dht_ok = false;
+  readDhtThrottled(&d.temperature, &d.humidity, &d.dht_ok);
+  d.motion = readPirMotion();
+  d.smoke = readSmokePresent();
+  return d;
+}
+
+// MQTT回调
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  char msg[384];
+  if (length >= sizeof(msg)) {
+    Serial.println("[MQTT] command payload too large");
+    return;
+  }
+  memcpy(msg, payload, length);
+  msg[length] = '\0';
+
+  char respTopic[192];
+  if (!buildHuaweiCommandResponseTopic(topic, respTopic, sizeof(respTopic))) {
+    Serial.println("[MQTT] cannot build response topic");
+    return;
+  }
+
+  JsonDocument doc;
+  DeserializationError err = deserializeJson(doc, msg);
+  if (err) {
+    publishCommandResponse(respTopic, 1, "json_parse_failed");
+    return;
+  }
+
+  const char* cmdName = doc["command_name"] | "";
+  JsonObjectConst paras = doc["paras"].as<JsonObjectConst>();
+
+  int rc = 0;
+  const char* rmsg = "success";
+
+  if (!strcasecmp(cmdName, "motor_set") || !strcasecmp(cmdName, "MotorSet")) {
+    int idx = paras["motor_index"] | paras["index"] | -1;
+    MotorDirection dir;
+    if (idx < 0 || idx > 3 || !parseMotorDirectionFromJson(paras["direction"] | paras["dir"], &dir)) {
+      rc = 2;
+      rmsg = "bad_motor_paras";
+    } else {
+      setMotorDirection((uint8_t)idx, dir);
+    }
+  } else if (!strcasecmp(cmdName, "motor_all") || !strcasecmp(cmdName, "MotorAll")) {
+    MotorDirection dir;
+    if (!parseMotorDirectionFromJson(paras["direction"] | paras["dir"], &dir)) {
+      rc = 3;
+      rmsg = "bad_motor_all_paras";
+    } else {
+      setAllMotors(dir);
+    }
+  }
+
+  publishCommandResponse(respTopic, rc, rmsg);
+}
+
+// 云上报
+void reportEnvDataToCloud() {
+  if (!cloudConfigured() || !mqttClient.connected()) return;
+
+  EnvData d = readEnvData();
+
+  JsonDocument root;
+  JsonArray services = root["services"].to<JsonArray>();
+  JsonObject svc     = services.add<JsonObject>();
+  svc["service_id"]  = "ESP32-IOT";
+
+  JsonObject props = svc["properties"].to<JsonObject>();
+  if (d.dht_ok) {
+    props["temperature"] = d.temperature;
+    props["humidity"]      = d.humidity;
+  }
+  props["motion"] = d.motion ? 1 : 0;
+  props["smoke"]  = d.smoke ? 1 : 0;
+
+  char jsonBuffer[384];
+  size_t len = serializeJson(root, jsonBuffer, sizeof(jsonBuffer));
+  mqttClient.publish(TOPIC_REPORT, jsonBuffer, len);
+}
+
+// 初始化
+void setup() {
+  Serial.begin(115200);
+  esp_task_wdt_init(30, true);
+  esp_task_wdt_add(NULL);
+
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  for (uint8_t i = 0; i < 4; ++i) {
+    pinMode(motors[i].in1, OUTPUT);
+    pinMode(motors[i].in2, OUTPUT);
+    setMotorDirection(i, MOTOR_STOP);
+  }
+
+  dht.begin();
+  pinMode(PIR_HC_SR501_PIN, INPUT);
+  pinMode(FC22_AO_PIN, INPUT);
+
+  connectWiFi();
+}
+
+// 主循环
+void loop() {
+  esp_task_wdt_reset();
+  unsigned long now = millis();
+
+  // WiFi重连
+  if (WiFi.status() != WL_CONNECTED) {
+    if (now - lastWiFiAttemptMs >= WIFI_RETRY_INTERVAL_MS) {
+      lastWiFiAttemptMs = now;
+      WiFi.disconnect();
+      WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    }
+  }
+
+  // MQTT重连
+  if (cloudConfigured()) {
+    if (!mqttClient.connected()) {
+      if (now - lastMqttAttemptMs >= MQTT_RETRY_INTERVAL_MS) {
+        lastMqttAttemptMs = now;
+        connectMQTTOnce();
+      }
+    } else {
+      mqttClient.loop();
+    }
+  }
+
+  // LED状态
+  static unsigned long lastLedToggle = 0;
+  if (WiFi.status() != WL_CONNECTED) {
+    if (now - lastLedToggle >= 500) {
+      lastLedToggle = now;
+      digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    }
+  } else {
+    digitalWrite(LED_PIN, HIGH);
+  }
+
+  // 定时上报
+  if (now - lastReportMs >= REPORT_INTERVAL_MS) {
+    lastReportMs = now;
+    reportEnvDataToCloud();
+  }
+}

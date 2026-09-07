@@ -1,0 +1,24 @@
+{
+	"auth": {
+		"identity": {
+			"methods": ["password"],
+			"password": {
+				"user": {
+					"name": "aa031002",
+					"password": "031002Aa",
+					"domain": {
+						"name": "3f69918809e241d08869899fea16a441"
+					}
+				}
+			}
+		},
+		"scope": {
+			"project": {
+				"name": "cn-north-4（北京四）"
+			}
+		}
+	}
+}
+
+
+
